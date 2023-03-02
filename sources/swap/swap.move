@@ -408,7 +408,6 @@ module baptswap::swap {
             };
 
             // Calculate and update user corrections
-            //Calculate and update user corrections
             user_info.reward_debt_x = reward_debt(coin::value(&user_info.staked_tokens), pool_info.magnified_dividends_per_share_x, pool_info.precision_factor);
             user_info.reward_debt_y = reward_debt(coin::value(&user_info.staked_tokens), pool_info.magnified_dividends_per_share_y, pool_info.precision_factor);
 
