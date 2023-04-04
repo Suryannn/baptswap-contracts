@@ -1,0 +1,56 @@
+// Define the module
+module Burnwallet {
+
+    // Define the struct for storing the custom tokens
+    struct Token {
+        address: address, // address of the custom token contract
+        identifier: u64 // identifier for the custom token within the contract
+    }
+
+    // Define the storage for storing the custom tokens
+    public storage: vector<Token>; // vector for storing the custom tokens
+
+    // Define the public function for receiving tokens
+    public fun deposit(amount: u64, token: address, identifier: u64) {
+        // Check if the token is recognized
+        let recognized = false; // initialize variable to check if token is recognized
+        let i = 0; // initialize loop counter
+        while i < vector::length<Token>(storage) { // iterate over the custom tokens stored in the wallet
+            if vector::get<Token>(storage, i).address == token && vector::get<Token>(storage, i).identifier == identifier { // check if the token is recognized
+                recognized = true; // mark the token as recognized
+                break; // exit the loop
+            }
+            i += 1; // increment the loop counter
+        }
+
+        // If the token is recognized, deposit it into the wallet
+        if recognized { // if the token is recognized
+            move::deposit<Token>(token, identifier, amount); // deposit the token into the wallet
+        } else {
+            // Otherwise, add the token to the storage and then deposit it into the wallet
+            let new_token = Token { address: token, identifier: identifier }; // create a new token struct with the provided address and identifier
+            vector::push<Token>(storage, new_token); // add the new token to the list of stored custom tokens
+            move::deposit<Token>(token, identifier, amount); // deposit the token into the wallet
+        }
+    }
+
+    // Define the public function for adding custom tokens
+    public fun add_token(token: address, identifier: u64) {
+        // Check if the token is already in the storage
+        let exists = false; // initialize variable to check if token already exists in the storage
+        let i = 0; // initialize loop counter
+        while i < vector::length<Token>(storage) { // iterate over the custom tokens stored in the wallet
+            if vector::get<Token>(storage, i).address == token && vector::get<Token>(storage, i).identifier == identifier { // check if the token already exists in the storage
+                exists = true; // mark the token as existing in the storage
+                break; // exit the loop
+            }
+            i += 1; // increment the loop counter
+        }
+
+        // If the token doesn't exist in the storage, add it
+        if !exists { // if the token doesn't already exist in the storage
+            let new_token = Token { address: token, identifier: identifier }; // create a new token struct with the provided address and identifier
+            vector::push<Token>(storage, new_token); // add the new token to the list of stored custom tokens
+        }
+    }
+}
